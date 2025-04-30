@@ -1,0 +1,53 @@
+<Chapter>
+	<Title></Title>
+	<Theory>
+        <text></text>
+        <note></note>
+    </Theory>
+	<Warning>
+        <text></text>
+        <note></note>
+    </Warning>
+	<Code>
+        <text></text>
+        <note></note>
+    </Code>
+	<ai_prompt>
+        <prompt></prompt>
+        <note></note>
+    </ai_prompt>
+	<Links>
+        <Link></Link>
+        <note></note>
+    </Links>
+	<Video>
+        <file_name></file_name>
+        <note></note>
+    </Video>
+	<Quiz>
+		<Question>
+            <text></text>
+            <note></note>
+            <answer correct=TRUE></answer>
+            <answer correct=FALSE></answer>
+            <answer correct=FALSE></answer>
+            <answer correct=FALSE></answer>
+        </Question>
+		<Question>
+            <text></text>
+            <note></note>
+            <answer correct=TRUE></answer>
+            <answer correct=FALSE></answer>
+            <answer correct=FALSE></answer>
+            <answer correct=FALSE></answer>
+        </Question>
+        <Question>
+            <text></text>
+            <note></note>
+            <answer correct=TRUE></answer>
+            <answer correct=FALSE></answer>
+            <answer correct=FALSE></answer>
+            <answer correct=FALSE></answer>
+        </Question>
+	</Quiz>
+</Chapter>

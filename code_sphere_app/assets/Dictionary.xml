@@ -1,0 +1,53 @@
+<chapter>
+	<title>Dictionaries in Python</title>
+	<theory>
+        <text>Python <i>dictionary</i> je datová struktura, která uchovává páry <b>klíč</b>-<b>hodnota</b>. Klíče musí být jedinečné a neměnné, zatímco hodnoty mohou být libovolného typu, včetně dalších slovníků nebo seznamů. Slovníky jsou neřazené, což znamená, že pořadí položek není zaručeno.</text>
+        <note>Dictionaries v Pythonu se definují pomocí složených závorek <pre>my_dict = {"key1": "value1", "key2": "value2"}</pre>.</note>
+  </theory>
+	<warning>
+        <text>Pokud se pokusíte použít neměnný (immutable) objekt, jako například seznam, jako klíč ve slovníku, Python vyhodí chybu.</text>
+        <note>Například: <pre>my_dict = {[1, 2]: "value"}</pre> způsobí chybu, protože seznam není platný klíč.</note>
+  </warning>
+	<code>
+        <text><pre>my_dict = {"name": "Alice", "age": 25}</pre></text>
+        <note>Pro práci se slovníky můžete použít metody jako <b>get()</b>, <b>keys()</b>, a <b>values()</b>. Například:</note>
+    </code>
+	<ai_prompt>
+        <prompt>Explain how dictionaries work in Python</prompt>
+        <note>Slovníky jsou užitečné pro uchovávání hodnot, které mají jedinečné klíče. Můžete je použít pro rychlé vyhledávání hodnot na základě klíče.</note>
+  </ai_prompt>
+	<links>
+        <link>https://docs.python.org/3/tutorial/datastructures.html#dictionaries</link>
+        <note>Oficiální dokumentace o slovnících v Pythonu.</note>
+  </links>
+	<video>
+        <file_name>Create a Dictionary Using Python.mp4</file_name>
+        <note>Video o práci se slovníky v Pythonu.</note>
+    </video>
+	<quiz>
+		<question>
+            <text>What is a dictionary in Python?</text>
+            <note>Remember, a dictionary stores key-value pairs!</note>
+            <answer correct=TRUE>A collection of key-value pairs</answer>
+            <answer correct=FALSE>A list of items</answer>
+            <answer correct=FALSE>An ordered collection</answer>
+            <answer correct=FALSE>A set of unique keys</answer>
+        </question>
+		<question>
+            <text>What will happen if you try to use a mutable object as a dictionary key?</text>
+            <note>Mutable objects, like lists, cannot be used as dictionary keys in Python.</note>
+            <answer correct=TRUE>An error will occur</answer>
+            <answer correct=FALSE>The dictionary will accept it</answer>
+            <answer correct=FALSE>The list will be converted to a tuple</answer>
+            <answer correct=FALSE>The list will be ignored</answer>
+        </question>
+        <question>
+            <text>Which method returns all the keys in a Python dictionary?</text>
+            <note>The <b>keys()</b> method is useful for getting all dictionary keys.</note>
+            <answer correct=TRUE>keys()</answer>
+            <answer correct=FALSE>values()</answer>
+            <answer correct=FALSE>items()</answer>
+            <answer correct=FALSE>get()</answer>
+        </question>
+	</quiz>
+</chapter>
