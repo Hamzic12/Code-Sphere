@@ -159,28 +159,42 @@ Future<void> getBaseDir() async {
 
     }
 
+bool checkZips(String chapterName) {
+  for (var file in localZipFiles){
+    if (file == chapterName){
+      return true;
+    }
+  }
+  return false;
+}
+
 Future<void> fetchFileNames() async {
   try {
     await getBaseDir();
+
     localZipFiles.clear();
-    var localzip = localDir
+    zipFilesList.clear();
+
+    final localzip = localDir
         .listSync()
         .whereType<File>()
         .where((file) => file.path.endsWith('.zip'))
         .map((file) => file.uri.pathSegments.last)
         .toList();
+
     localzip.sort((a, b) {
       return extractNumberFromFileName(a).compareTo(extractNumberFromFileName(b));
     });
+
     setState(() {
       localZipFiles = localzip;
-      zipFilesList = localzip;
+      zipFilesList = List.from(localzip);  // důležité - duplikace jako nový list
     });
 
     debugPrint('Lokální soubory: ${localZipFiles.join(', ')}');
-    
 
-    if (Connectivity().checkConnectivity() != ConnectivityResult.none) {
+    final connectivity = await Connectivity().checkConnectivity();
+    if (connectivity != ConnectivityResult.none) {
       final response = await http.get(Uri.parse(githubURL));
 
       if (response.statusCode == 200) {
@@ -190,6 +204,7 @@ Future<void> fetchFileNames() async {
             .map((f) => f['name'] as String)
             .toList();
 
+        // Přidej jen nové soubory z GitHubu
         for (var file in remoteZipFiles) {
           if (!zipFilesList.contains(file)) {
             zipFilesList.add(file);
@@ -201,7 +216,7 @@ Future<void> fetchFileNames() async {
         debugPrint('Chyba při načítání GitHub souborů: ${response.statusCode}');
       }
     }
-  
+
     zipFilesList.sort((a, b) {
       return extractNumberFromFileName(a).compareTo(extractNumberFromFileName(b));
     });
@@ -261,9 +276,10 @@ int extractNumberFromFileName(String fileName) {
               onPressed: () {
                   
                  if (localZipFiles.contains(chapter)) {
-                 uri = '${localDir.path}/$chapter';
-             } else {
-                uri = "https://raw.githubusercontent.com/Hamzic12/Code-Sphere-Chapters/main/$chapter";
+                  uri = '${localDir.path}/$chapter';
+                } 
+                else {
+                  uri = "https://raw.githubusercontent.com/Hamzic12/Code-Sphere-Chapters/main/$chapter";
                 }
 
                   zipParser(uri, chapter, () {
