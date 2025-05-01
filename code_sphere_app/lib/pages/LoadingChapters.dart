@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'chapter.dart';
+import 'Chapter.dart';
 import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,24 +17,25 @@ class LoadingChaptersPage extends StatefulWidget {
 }
 
 class _LoadingChaptersPage extends State<LoadingChaptersPage> {
-  
   List<String> zipFilesList = [];
   String fileName = "";
   String xmlContent = "";
   String filesContents = "";
   dynamic uri;
   String? mp4FilePath;
-  String repoName = "";
+  String repoName = "Code-Sphere-Chapters";
   late Directory localDir;
   List<String> localZipFiles = [];
   List<String> repoList = [];
-
+  String selectedRepo = '';
   @override
   void initState() {
     super.initState();
     fetchFileNames(); 
     requestStoragePermission();
-    loadRepoList();
+     Future.delayed(Duration(milliseconds: 500), () {
+      loadRepoList();
+    });
   }
 
 
@@ -135,7 +136,6 @@ Future<void> getBaseDir() async {
     final directoryPath = '/storage/emulated/0/Documents/CS_chapters';
     newDir = Directory(directoryPath);
 
-    // Pokud složka neexistuje, vytvoříme ji
     if (!(await newDir.exists())) {
       await newDir.create(recursive: true);
       debugPrint('Složka vytvořena: ${newDir.path}');
@@ -147,7 +147,6 @@ Future<void> getBaseDir() async {
     final directoryPath = '${baseDir.path}/CS_Chapters';
     newDir = Directory(directoryPath);
 
-    // Pokud složka neexistuje, vytvoříme ji
     if (!(await newDir.exists())) {
       await newDir.create(recursive: true);
       debugPrint('Složka vytvořena: ${newDir.path}');
@@ -158,20 +157,19 @@ Future<void> getBaseDir() async {
     throw UnsupportedError('Nepodporovaná platforma');
   }
 
-   // Zkontrolujeme existenci souboru repo.txt
+
   final repoFile = File('${newDir.path}/repo.txt');
   bool repoFileExists = await repoFile.exists();
 
-  // Pokud soubor neexistuje, vytvoříme nový soubor
   if (!repoFileExists) {
-    await repoFile.writeAsString('');
+    await repoFile.writeAsString('Code-Sphere-Chapters\n', mode: FileMode.write);
     debugPrint('Soubor repo.txt vytvořen v: ${repoFile.path}');
   } else {
     debugPrint('Soubor repo.txt již existuje: ${repoFile.path}');
   }
 
   setState(() {
-    localDir = newDir!;  // Nastavení hodnoty pro localDir
+    localDir = newDir!; 
   });
 }
 
@@ -196,11 +194,13 @@ Future<void> fetchFileNames() async {
 
     setState(() {
       localZipFiles = localzip;
-      zipFilesList = List.from(localzip);  // důležité - duplikace jako nový list
+      zipFilesList = List.from(localzip);  // duplikace jako nový list
     });
 
-    debugPrint('Lokální soubory: ${localZipFiles.join(', ')}');
-    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Načítá se soubory z Github repozitáře: $repoName'))
+    );
+
     final connectivity = await Connectivity().checkConnectivity();
     if (connectivity != ConnectivityResult.none) {
       final response = await http.get(Uri.parse(githubURL));
@@ -212,16 +212,24 @@ Future<void> fetchFileNames() async {
             .map((f) => f['name'] as String)
             .toList();
 
-        // Přidej jen nové soubory z GitHubu
         for (var file in remoteZipFiles) {
           if (!zipFilesList.contains(file)) {
             zipFilesList.add(file);
           }
         }
 
-        debugPrint('Přidané z GitHubu: ${remoteZipFiles.join(', ')}');
-      } else {
-        debugPrint('Chyba při načítání GitHub souborů: ${response.statusCode}');
+       
+      } 
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            response.statusCode == 404
+                ? 'Chyba: repozitář neexistuje'
+                : 'Chyba při načítání GitHub souborů: ${response.statusCode}',
+            ),
+          ),
+        );
       }
     }
 
@@ -229,13 +237,15 @@ Future<void> fetchFileNames() async {
       return extractNumberFromFileName(a).compareTo(extractNumberFromFileName(b));
     });
 
-    debugPrint('Finální seřazené: ${zipFilesList.join(', ')}');
-
     setState(() {
       zipFilesList;
     });
+
   } catch (e) {
-    debugPrint('Chyba: $e');
+    // Catch any error and show it in the Snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: $e'))
+    );
   }
 }
 
@@ -280,8 +290,8 @@ Widget build(BuildContext context) {
     ),
     child: DropdownButton<String>(
       isExpanded: true,
-      hint: const Text("Kapitoly", style: TextStyle(color: Colors.white,fontSize: 20)),
-      value: null, // nezobrazuj aktuální hodnotu
+      hint: const Text("            Kapitoly", style: TextStyle(color: Colors.white,fontSize: 20)), // I had to
+      value: null,
       dropdownColor: const Color.fromARGB(255, 1, 24, 36),
       iconEnabledColor: Colors.white,
       items: repoList.map((repo) {
@@ -309,8 +319,16 @@ Widget build(BuildContext context) {
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh, color: Colors.white),
-          onPressed: fetchFileNames,
-        ),
+          onPressed: () async {
+            try {
+              await fetchFileNames();
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Chyba při aktualizaci souboru: $e'))
+              );
+            }
+          },
+        )
       ],
     ),
     body: ListView.builder(
@@ -345,6 +363,7 @@ Widget build(BuildContext context) {
                       xmlContent: xmlContent,
                       mp4FilePath: mp4FilePath,
                       localDir: localDir,
+                      selectedRepo : repoName
                     ),
                   ),
                 ).then((_) {
@@ -382,12 +401,20 @@ Widget build(BuildContext context) {
                   onPressed: () async {
                     final input = _repoController.text.trim();
                     if (input.isNotEmpty) {
-                      final file = File('${localDir.path}/repo.txt');
-                      await file.writeAsString('$input\n', mode: FileMode.append);
-                      setState(() {
-                        repoList.add(input);
-                      });
-                      Navigator.pop(context);
+                      try {
+                        final file = File('${localDir.path}/repo.txt');
+                        await file.writeAsString('$input\n', mode: FileMode.append);
+
+                        setState(() {
+                          repoList.add(input);
+                        });
+
+                        Navigator.pop(context);
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Chyba: $e'))
+                        );
+                      }
                     }
                   },
                   child: const Text("Přidat", style: TextStyle(color: Colors.white)),

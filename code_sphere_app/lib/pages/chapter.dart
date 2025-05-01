@@ -5,7 +5,7 @@ import 'package:xml/xml.dart' as xml;
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:video_player/video_player.dart';
-import 'quiz.dart';
+import 'Quiz.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ChapterPage extends StatefulWidget {
@@ -13,13 +13,15 @@ class ChapterPage extends StatefulWidget {
   final String xmlContent;
   final Directory localDir;
   final String? mp4FilePath;
+  final String selectedRepo;
 
   const ChapterPage({
     super.key,
     required this.fileName,
     required this.xmlContent,
     required this.localDir,
-    required this.mp4FilePath
+    required this.mp4FilePath,
+    required this.selectedRepo
   });
   @override
   _ChapterPage createState() => _ChapterPage();
@@ -491,7 +493,8 @@ Widget build(BuildContext context) {
         IconButton(
           icon: Icon(Icons.download, color: Colors.white),
           onPressed: () async {
-            final url = 'https://raw.githubusercontent.com/Hamzic12/Code-Sphere-Chapters/main/${widget.fileName}';
+            final url = 'https://raw.githubusercontent.com/Hamzic12/${widget.selectedRepo}/main/${widget.fileName}';
+            print(url);
              try {
                     await downloadAndSaveZip(url);
                     ScaffoldMessenger.of(context).showSnackBar(
