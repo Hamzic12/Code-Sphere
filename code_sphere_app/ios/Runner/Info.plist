@@ -9,10 +9,8 @@
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Potřebujeme přístup pro uložení a čtení výukových souborů.</string>
 	<key>NSDocumentsFolderUsageDescription</key>
 	<string>Aplikace potřebuje přístup k dokumentům pro práci se soubory.</string>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>Code Sphere App</string>
 	<key>CFBundleExecutable</key>
