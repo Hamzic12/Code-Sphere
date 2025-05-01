@@ -19,19 +19,22 @@ class LoadingChaptersPage extends StatefulWidget {
 class _LoadingChaptersPage extends State<LoadingChaptersPage> {
   
   List<String> zipFilesList = [];
-  String githubURL = "https://api.github.com/repos/Hamzic12/Code-Sphere-Chapters/contents/";
   String fileName = "";
   String xmlContent = "";
   String filesContents = "";
   dynamic uri;
   String? mp4FilePath;
+  String repoName = "";
   late Directory localDir;
   List<String> localZipFiles = [];
+  List<String> repoList = [];
+
   @override
   void initState() {
     super.initState();
     fetchFileNames(); 
     requestStoragePermission();
+    loadRepoList();
   }
 
 
@@ -126,49 +129,54 @@ Future<void> requestStoragePermission() async {
 
 
 Future<void> getBaseDir() async {
+  Directory? newDir;
 
-    Directory? newDir;
-    if (Platform.isAndroid) {
-      final directoryPath = '/storage/emulated/0/Documents/CS_chapters';
-      newDir = Directory(directoryPath);
+  if (Platform.isAndroid) {
+    final directoryPath = '/storage/emulated/0/Documents/CS_chapters';
+    newDir = Directory(directoryPath);
 
-
-      if (!(await newDir.exists())) {
-        await newDir.create(recursive: true);
-        debugPrint('Složka vytvořena: ${newDir.path}');
-      } else {
-        debugPrint('Složka již existuje: ${newDir.path}');
-      }
-    } else if (Platform.isIOS) {
-      final baseDir = await getApplicationDocumentsDirectory();
-      final directoryPath = '${baseDir.path}/CS_Chapters';
-      newDir = Directory(directoryPath);
-
-      if (!(await newDir.exists())) {
-        await newDir.create(recursive: true);
-        debugPrint('Složka vytvořena: ${newDir.path}');
-      } else {
-        debugPrint('Složka již existuje: ${newDir.path}');
-      }
+    // Pokud složka neexistuje, vytvoříme ji
+    if (!(await newDir.exists())) {
+      await newDir.create(recursive: true);
+      debugPrint('Složka vytvořena: ${newDir.path}');
     } else {
-      throw UnsupportedError('Nepodporovaná platforma');
+      debugPrint('Složka již existuje: ${newDir.path}');
     }
-    setState(() {
-      localDir = newDir!;
-    });
+  } else if (Platform.isIOS) {
+    final baseDir = await getApplicationDocumentsDirectory();
+    final directoryPath = '${baseDir.path}/CS_Chapters';
+    newDir = Directory(directoryPath);
 
+    // Pokud složka neexistuje, vytvoříme ji
+    if (!(await newDir.exists())) {
+      await newDir.create(recursive: true);
+      debugPrint('Složka vytvořena: ${newDir.path}');
+    } else {
+      debugPrint('Složka již existuje: ${newDir.path}');
     }
-
-bool checkZips(String chapterName) {
-  for (var file in localZipFiles){
-    if (file == chapterName){
-      return true;
-    }
+  } else {
+    throw UnsupportedError('Nepodporovaná platforma');
   }
-  return false;
+
+   // Zkontrolujeme existenci souboru repo.txt
+  final repoFile = File('${newDir.path}/repo.txt');
+  bool repoFileExists = await repoFile.exists();
+
+  // Pokud soubor neexistuje, vytvoříme nový soubor
+  if (!repoFileExists) {
+    await repoFile.writeAsString('');
+    debugPrint('Soubor repo.txt vytvořen v: ${repoFile.path}');
+  } else {
+    debugPrint('Soubor repo.txt již existuje: ${repoFile.path}');
+  }
+
+  setState(() {
+    localDir = newDir!;  // Nastavení hodnoty pro localDir
+  });
 }
 
 Future<void> fetchFileNames() async {
+  String githubURL = "https://api.github.com/repos/Hamzic12/$repoName/contents/";
   try {
     await getBaseDir();
 
@@ -192,7 +200,7 @@ Future<void> fetchFileNames() async {
     });
 
     debugPrint('Lokální soubory: ${localZipFiles.join(', ')}');
-
+    
     final connectivity = await Connectivity().checkConnectivity();
     if (connectivity != ConnectivityResult.none) {
       final response = await http.get(Uri.parse(githubURL));
@@ -236,76 +244,161 @@ int extractNumberFromFileName(String fileName) {
   return match != null ? int.parse(match.group(1)!) : 0;
 }
 
+Future<void> loadRepoList() async {
+  final file = File('${localDir.path}/repo.txt');
+  if (await file.exists()) {
+    final lines = await file.readAsLines();
+    setState(() {
+      repoList = lines.where((line) => line.trim().isNotEmpty).toList();
+    });
+  }
+}
 
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 99, 184, 230), // Světle modré pozadí
+@override
+Widget build(BuildContext context) {
+  final TextEditingController _repoController = TextEditingController();
+  String selectedRepo = repoList.isNotEmpty ? repoList.first : 'Seznam kapitol';
+
+   return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 99, 184, 230),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 1, 24, 36), // Tmavě modrá
+        backgroundColor: const Color.fromARGB(255, 1, 24, 36),
         foregroundColor: Colors.white,
-        title: Text(
-          "Seznam kapitol",
-          style: TextStyle(color: Colors.white),
-        ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: fetchFileNames,
-          ),
-        ],
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        itemCount: zipFilesList.length,
-        itemBuilder: (context, index) {
-          String chapter = zipFilesList[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 1, 24, 36),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              onPressed: () {
-                  
-                 if (localZipFiles.contains(chapter)) {
-                  uri = '${localDir.path}/$chapter';
-                } 
-                else {
-                  uri = "https://raw.githubusercontent.com/Hamzic12/Code-Sphere-Chapters/main/$chapter";
-                }
+        title: Row(
+  children: [
 
-                  zipParser(uri, chapter, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChapterPage(
-                          fileName: fileName,
-                          xmlContent: xmlContent,
-                          mp4FilePath: mp4FilePath,
-                          localDir: localDir,
-                        ),
-                      ),
-                    ).then((_) {
-                      fetchFileNames();
-                    });
-                  });
-                },
-              child: Text(
-                chapter.replaceAll('.zip', ''),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    Container(
+  width: 210, // Šířka samotného tlačítka
+  child: DropdownButtonHideUnderline(
+  child: Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8),
+    decoration: BoxDecoration(
+      color: const Color.fromARGB(255, 1, 24, 36),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: DropdownButton<String>(
+      isExpanded: true,
+      hint: const Text("Kapitoly", style: TextStyle(color: Colors.white,fontSize: 20)),
+      value: null, // nezobrazuj aktuální hodnotu
+      dropdownColor: const Color.fromARGB(255, 1, 24, 36),
+      iconEnabledColor: Colors.white,
+      items: repoList.map((repo) {
+        return DropdownMenuItem<String>(
+          value: repo,
+          child: Text(repo, style: const TextStyle(color: Colors.white)),
+        );
+      }).toList(),
+      onChanged: (value) {
+        if (value != null) {
+          setState(() {
+            selectedRepo = value;
+            repoName = selectedRepo;
+            loadRepoList();
+            fetchFileNames();
+          });
+        }
+      },
+    ),
+  ),
+),
+    ),
+  ],
+),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh, color: Colors.white),
+          onPressed: fetchFileNames,
+        ),
+      ],
+    ),
+    body: ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      itemCount: zipFilesList.length,
+      itemBuilder: (context, index) {
+        String chapter = zipFilesList[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 1, 24, 36),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
             ),
-          );
-        },
-      ),
-    );
-  }
+            onPressed: () {
+              if (localZipFiles.contains(chapter)) {
+                uri = '${localDir.path}/$chapter';
+              } else {
+                uri = "https://raw.githubusercontent.com/Hamzic12/$repoName/main/$chapter";
+              }
+
+              zipParser(uri, chapter, () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChapterPage(
+                      fileName: fileName,
+                      xmlContent: xmlContent,
+                      mp4FilePath: mp4FilePath,
+                      localDir: localDir,
+                    ),
+                  ),
+                ).then((_) {
+                  fetchFileNames();
+                });
+              });
+            },
+            child: Text(
+              chapter.replaceAll('.zip', ''),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+        );
+      },
+    ),
+    floatingActionButton: FloatingActionButton(
+      backgroundColor: const Color.fromARGB(255, 1, 24, 36),
+      child: const Icon(Icons.add, color: Colors.white),
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              backgroundColor: const Color.fromARGB(255, 99, 184, 230),
+              title: const Text("Přidat záznam", style: TextStyle(color: Colors.white)),
+              content: TextField(
+                controller: _repoController,
+                style: const TextStyle(color: Colors.black),
+                decoration: const InputDecoration(
+                  hintText: 'Zadej název',
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () async {
+                    final input = _repoController.text.trim();
+                    if (input.isNotEmpty) {
+                      final file = File('${localDir.path}/repo.txt');
+                      await file.writeAsString('$input\n', mode: FileMode.append);
+                      setState(() {
+                        repoList.add(input);
+                      });
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text("Přidat", style: TextStyle(color: Colors.white)),
+                )
+              ],
+            );
+          },
+        );
+      },
+    ),
+  );
+}
+
 }
