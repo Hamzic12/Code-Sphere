@@ -31,17 +31,14 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
   void initState() {
     super.initState();
     requestStoragePermission();
-    Future.delayed(Duration(milliseconds: 500), () {
-      loadRepoList();
-      if (repoList.isNotEmpty)
-      {
-        repoName = repoList.first;
-      }
-      else
-      {
-        repoName = "Code-Sphere-Chapters";
-      }
-      fetchFileNames(); 
+    Future.delayed(const Duration(milliseconds: 500), () async {
+      await loadRepoList();
+      setState(() {
+        if (repoList.isNotEmpty) {
+          repoName = repoList.first;
+        }
+      });
+      fetchFileNames();
     });
   }
 
@@ -205,7 +202,9 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Načítá se soubory z Github repozitáře: $repoName'))
+        SnackBar(content: Text('Načítají se soubory z Github repozitáře: $repoName'),
+        duration: Duration(milliseconds: 1000),
+        )
       );
 
       final connectivity = await Connectivity().checkConnectivity();
@@ -233,8 +232,9 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
             content: Text(
               response.statusCode == 404
                   ? 'Chyba: repozitář neexistuje'
-                  : 'Chyba při načítání GitHub souborů: ${response.statusCode}',
+                  : 'Chyba při načítání Github souborů: ${response.statusCode}',
               ),
+              duration: Duration(milliseconds: 1200),
             ),
           );
         }
@@ -249,7 +249,6 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
       });
 
     } catch (e) {
-      // Catch any error and show it in the Snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e'))
       );
@@ -277,13 +276,24 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
       if (!await file.exists()) return;
 
       List<String> lines = await file.readAsLines();
+      int deletedIndex = repoList.indexOf(repoName);
+
       lines.removeWhere((line) => line.trim() == repoName.trim());
-      await file.writeAsString(lines.join('\n'));
+      await file.writeAsString(lines.join('\n') + '\n');
 
       setState(() {
-        repoList.remove(repoName);
+        if (deletedIndex >= 0 && deletedIndex < repoList.length) {
+          repoList.removeAt(deletedIndex);
+        }
+
         if (repoList.isNotEmpty) {
-          repoName = repoList.first;
+          if (deletedIndex < repoList.length) {
+            repoName = repoList[deletedIndex]; 
+          } else if (deletedIndex - 1 >= 0) {
+            repoName = repoList[deletedIndex - 1];
+          } else {
+            repoName = '';
+          }
           fetchFileNames();
         } else {
           repoName = '';
@@ -291,11 +301,10 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Chyba při mazání: $e')),
+        const SnackBar(content: Text('Chyba při mazání')),
       );
     }
   }
-
   
 
   @override
@@ -345,36 +354,38 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
               ),
             ),
             const SizedBox(width: 3),
-            // MÍNUSOVÉ TLAČÍTKO
-            IconButton(
-              icon: const Icon(Icons.remove_circle, color: Colors.redAccent),
+           IconButton(
+              icon: Icon(
+          Icons.remove_circle, color: repoList.isEmpty ? Colors.grey : Colors.redAccent),
               iconSize: 20,
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: const Color.fromARGB(255, 99, 184, 230),
-                    title: const Text('Smazat kapitolu', style: TextStyle(color: Colors.white)),
-                    content: Text('Chcete smazat kapitolu "$repoName"?', style: const TextStyle(color: Colors.black)),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          deleteSelectedRepo();
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Smazat', style: TextStyle(color: Colors.red)),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Zavřít', style: TextStyle(color: Colors.black)),
-                      ),
-                    ],
+              onPressed: repoList.isEmpty
+                  ? null // disables the button
+                  : () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          backgroundColor: const Color.fromARGB(255, 99, 184, 230),
+                          title: const Text('Smazat kapitolu', style: TextStyle(color: Colors.white)),
+                          content: Text('Chcete smazat kapitolu $repoName?', style: const TextStyle(color: Colors.black)),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                deleteSelectedRepo();
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Smazat', style: TextStyle(color: Colors.red)),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Zavřít', style: TextStyle(color: Colors.black)),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ],
-        ),
+                ],
+              ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
