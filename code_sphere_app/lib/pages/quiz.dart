@@ -30,6 +30,7 @@ Widget build(BuildContext context) {
     backgroundColor: const Color.fromARGB(255, 120, 204, 255),
     appBar: AppBar(
       backgroundColor: const Color.fromARGB(255, 1, 24, 36),
+      centerTitle: true,
       title: const Text('Kvíz'),
       titleTextStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
       leading: IconButton(

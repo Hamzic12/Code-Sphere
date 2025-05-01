@@ -48,7 +48,7 @@ class _ChapterPage extends State<ChapterPage> {
   List<String> notes = [];
   List<List<String>> answers = [];
   List<int> correctAnswers = [];
-  String? apiKey ='AIzaSyAAbCZogB2s7lnE5hip2ffOVspl_W7ijQM';
+  final apiKey = dotenv.env['API_KEY'];
   
 
   @override
@@ -256,7 +256,6 @@ void _playVideo(String videoPath) async {
       },
     );
   } catch (e) {
-    print('Chyba při načítání videa: $e');
   }
 }
 
@@ -440,7 +439,6 @@ void _playVideo(String videoPath) async {
 
   Future<void> downloadAndSaveZip(String url) async {
   try {
-    print('${widget.localDir.path}/${widget.fileName}/$videoFile');
     final response = await http.get(Uri.parse(url));
     
     if (response.statusCode != 200) {
@@ -494,7 +492,6 @@ Widget build(BuildContext context) {
           icon: Icon(Icons.download, color: Colors.white),
           onPressed: () async {
             final url = 'https://raw.githubusercontent.com/Hamzic12/${widget.selectedRepo}/main/${widget.fileName}';
-            print(url);
              try {
                     await downloadAndSaveZip(url);
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -614,13 +611,9 @@ Widget build(BuildContext context) {
                                     fontSize: 15,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    shadows: [
-                                      Shadow(
-                                        offset: Offset(0, 2),
-                                        blurRadius: 0.5,
-                                        color: Color.fromARGB(255, 1, 24, 36), 
-                                      ),
-                                    ],
+                                    decoration: TextDecoration.underline,  // Podtržení
+                                    decorationColor: Colors.white,  // Bílé podtržení
+                                    decorationThickness: 2
                                   ),
                                   ),
                             ))
@@ -648,8 +641,18 @@ Widget build(BuildContext context) {
                       onTap: () {
                         _playVideo(widget.mp4FilePath!);
                       },
-                      child: Text(videoFile, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.bold, shadows: [Shadow(offset: Offset(0, 2), blurRadius: 0.5, color: Color.fromARGB(255, 1, 24, 36))])),
-
+                      child: Text(
+                                    videoFile.replaceAll('.mp4', ''),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.white,  // Bílé písmo
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline,  // Podtržení
+                                      decorationColor: Colors.white,  // Bílé podtržení
+                                      decorationThickness: 2,  // Tloušťka podtržení
+                                    ),
+                                  ),
                     ),
                   ),
                 ],
