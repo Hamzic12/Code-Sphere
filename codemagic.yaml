@@ -8,20 +8,25 @@ workflows:
     scripts:
       - name: Flutter Pub Get
         script: |
+          cd code_sphere_app
           flutter pub get
 
       - name: Generování .env souboru
         script: |
+          cd code_sphere_app
           echo "API_KEY=$API_KEY" > .env
 
       - name: Build iOS App (Release)
         script: |
+          cd code_sphere_app
           flutter build ios --release --no-codesign
+
       - name: Export IPA
         script: |
-          cd build/ios/iphoneos
-          xcrun -sdk iphoneos PackageApplication -v Runner.app -o $HOME/ipa/Runner.ipa
+          cd code_sphere_app/build/ios/iphoneos
+          mkdir -p $CM_BUILD_DIR/ipa
+          xcrun -sdk iphoneos PackageApplication -v Runner.app -o $CM_BUILD_DIR/ipa/Runner.ipa
 
     artifacts:
-      # Ukládáme IPA soubor jako artefakt
-      - $HOME/ipa/Runner.ipa
+      - code_sphere_app/build/ios/iphoneos/Runner.app
+      - $CM_BUILD_DIR/ipa/Runner.ipa
