@@ -3,8 +3,8 @@ import 'pages/LoadingChapters.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() {
-  dotenv.load();
-  runApp(const CodeSphere());
+    dotenv.load(fileName: ".env");
+    runApp(const CodeSphere());
 }
 
 class CodeSphere extends StatelessWidget {
