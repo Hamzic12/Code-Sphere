@@ -18,8 +18,17 @@ workflows:
         script: |
           cd code_sphere_app
           flutter build ios --release --no-codesign
+      - name: Zkontrolovat přítomnost Runner.app
+        script: |
+          if [ -d "build/ios/iphoneos/Runner.app" ]; then
+            echo "Soubor Runner.app existuje."
+          else
+            echo "Soubor Runner.app neexistuje."
+            exit 1
+          fi
       - name: Zabalit Runner.app do ZIP
         script: |
+          echo "Zabaluji Runner.app do ZIP..."
           cd code_sphere_app
           zip -r build/ios/iphoneos/Runner.app.zip build/ios/iphoneos/Runner.app
       - name: Zkontrolovat, zda soubor existuje
@@ -38,4 +47,4 @@ workflows:
     publishing:
       email:
         recipients:
-          - name@example.com
+          - Hamzic21@email.cz
