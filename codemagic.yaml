@@ -24,4 +24,10 @@ workflows:
           zip -r build/ios/iphoneos/Runner.app.zip build/ios/iphoneos/Runner.app
       - name: Uložení ZIP souboru
         script: |
-          mv code_sphere_app/build/ios/iphoneos/Runner.app.zip $HOME/Runner.app.zip
+          mv build/ios/iphoneos/Runner.app.zip $HOME/Runner.app.zip
+    artifacts:
+      - $HOME/Runner.app.zip
+    publishing:
+      email:
+        recipients:
+          - Hamzic21@email.cz
