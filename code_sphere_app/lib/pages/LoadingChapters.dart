@@ -7,7 +7,6 @@ import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class LoadingChaptersPage extends StatefulWidget {
   const LoadingChaptersPage({super.key});
@@ -30,7 +29,7 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
   @override
   void initState() {
     super.initState();
-    requestStoragePermission();
+    getBaseDir();
     Future.delayed(const Duration(milliseconds: 500), () async {
       await loadRepoList();
       setState(() {
@@ -103,34 +102,6 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
     callback();
   }
 
-
-  Future<void> requestStoragePermission() async {
-    bool permissionGranted = false;
-
-    if (Platform.isAndroid) {
-      if (await Permission.manageExternalStorage.isGranted ||
-          await Permission.storage.isGranted) {
-        permissionGranted = true;
-      } else {
-        var status = await Permission.manageExternalStorage.request();
-        if (status.isGranted) {
-          permissionGranted = true;
-        } else {
-          // fallback pro starší verze
-          var legacyStatus = await Permission.storage.request();
-          permissionGranted = legacyStatus.isGranted;
-        }
-      }
-    } else if (Platform.isIOS) {
-      permissionGranted = true;
-    }
-
-    if (permissionGranted) {
-      await getBaseDir();
-    } else {
-      debugPrint('Oprávnění nebylo uděleno.');
-    }
-  }
 
 
   Future<void> getBaseDir() async {
@@ -458,7 +429,7 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
             builder: (context) {
               return AlertDialog(
                 backgroundColor: const Color.fromARGB(255, 99, 184, 230),
-                title: const Text("Přidat záznam", style: TextStyle(color: Colors.white)),
+                title: const Text("Přidat repozitář", style: TextStyle(color: Colors.white)),
                 content: TextField(
                   controller: _repoController,
                   style: const TextStyle(color: Colors.black),

@@ -556,7 +556,7 @@ Widget build(BuildContext context) {
                 try {
                     await downloadAndSaveZip(url);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Soubor byl úspěšně stažen.'),
+                      SnackBar(content: Text('Soubor byl úspěšně stažen v ${widget.localDir}.'),
                       duration: Duration(milliseconds: 1000),
                     ),
                   );
