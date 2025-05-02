@@ -16,4 +16,6 @@ workflows:
           flutter pub get
       - name: Flutter Build iOS
         script: |
-          flutter build ios --release
+          cd code_sphere_app
+          flutter clean  # Tohle přidat může pomoct vyčistit cache
+          flutter build ios --release --no-codesign
