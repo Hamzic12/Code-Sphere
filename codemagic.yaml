@@ -1,9 +1,39 @@
 workflows:
-  build-android:
-    name: Build ios
+  build-ios:
+    name: Build iOS IPA
     environment:
       flutter: stable
+      vars:
+        API_KEY: $API_KEY  # Přidej si vlastní API_KEY proměnnou
     scripts:
+      # 1. Instalace závislostí
+      - name: Flutter Pub Get
+        script: |
+          flutter pub get
+
+      # 2. Generování .env souboru, pokud ho používáš
       - name: Generování .env souboru
         script: |
           echo "API_KEY=$API_KEY" > .env
+
+      # 3. Build pro iOS (release) - bez codesign
+      - name: Build iOS App (Release)
+        script: |
+          flutter build ios --release --no-codesign
+
+      # 4. Export IPA souboru pro distribuci
+      - name: Export IPA
+        script: |
+          cd build/ios/iphoneos
+          xcrun -sdk iphoneos PackageApplication -v Runner.app -o $HOME/ipa/Runner.ipa
+
+    artifacts:
+      # Ukládáme IPA soubor jako artefakt
+      - $HOME/ipa/Runner.ipa
+
+    publishing:
+      # Publikování artefaktu (IPA souboru)
+      - provider: app_store_connect
+        app_identifier: com.example.yourapp  # Nahraď s ID aplikace na App Store
+        ipa_path: $HOME/ipa/Runner.ipa
+        api_key: $API_KEY  # Pokud používáš API_KEY pro komunikaci s App Store Connect
