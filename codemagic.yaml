@@ -16,10 +16,12 @@ workflows:
           flutter pub get
       - name: Flutter Build iOS
         script: |
+          cd code_sphere_app
           flutter build ios --release --no-codesign
       - name: Zabalit Runner.app do ZIP
         script: |
+          cd code_sphere_app
           zip -r build/ios/iphoneos/Runner.app.zip build/ios/iphoneos/Runner.app
       - name: Uložení ZIP souboru
         script: |
-          mv build/ios/iphoneos/Runner.app.zip $HOME/Runner.app.zip
+          mv code_sphere_app/build/ios/iphoneos/Runner.app.zip $HOME/Runner.app.zip
