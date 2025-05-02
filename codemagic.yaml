@@ -1,6 +1,6 @@
 workflows:
   build-android:
-    name: Build Android APK
+    name: Build ios
     environment:
       flutter: stable
     scripts:
