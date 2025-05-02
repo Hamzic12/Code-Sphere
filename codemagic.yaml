@@ -1,6 +1,19 @@
 workflows:
-  build-ios:
-    name: Build iOS
-    environment:    
+  ios-build:
+    name: iOS Build Only
+    environment:
+      flutter: 3.32.0-0.3.pre
+      xcode: latest
       vars:
         API_KEY: $API_KEY
+    scripts:
+      - name: Vytvoř .env soubor
+        script: |
+          echo "API_KEY=$API_KEY" > code_sphere_app/.env
+      - name: Flutter Pub Get
+        script: |
+          cd code_sphere_app
+          flutter pub get
+      - name: Flutter Build iOS
+        script: |
+          flutter build ios --release
