@@ -41,7 +41,6 @@ Widget build(BuildContext context) {
     body: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Otázka s poznámkou
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 20),
           child: Container(
@@ -71,8 +70,6 @@ Widget build(BuildContext context) {
             ),
           ),
         ),
-
-        // Tlačítko Další otázka vpravo
         Padding(
           padding: const EdgeInsets.only(right: 20, top: 12),
           child: Align(
@@ -131,7 +128,7 @@ Widget build(BuildContext context) {
             mainAxisSpacing: 16,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.25, // větší číslo = menší výška
+            childAspectRatio: 1.25,
             children: List.generate(4, (index) {
               final isCorrect = widget.correctAnswers[currentIndex] == index;
               final isSelected = selectedAnswer == index;

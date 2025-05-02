@@ -28,7 +28,7 @@ class CodeSphere extends StatelessWidget {
                     color: Colors.black,
                   ),
                 ),
-                SizedBox(height: 20),  // Mezera mezi textem a tlačítkem
+                SizedBox(height: 20),
                 ElevatedButton(
                   child: const Text("Načíst kapitoly"),
                   onPressed: () {

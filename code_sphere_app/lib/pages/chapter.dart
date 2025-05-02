@@ -49,18 +49,25 @@ class _ChapterPage extends State<ChapterPage> {
   List<List<String>> answers = [];
   List<int> correctAnswers = [];
   final apiKey = dotenv.env['API_KEY'];
-  
+  late File zipFile;
+  late bool fileExists;
 
   @override
   void initState() {
     super.initState();
+    zipFile = File('${widget.localDir.path}/${widget.fileName}');
+    zipFile.exists().then((exists) {
+    setState(() {
+      fileExists = exists;
+    });
+  });
 
-  if (widget.xmlContent.isNotEmpty) {
+    if (widget.xmlContent.isNotEmpty) {
     xmlParser(widget.xmlContent);
     }
   }
   
-void _playVideo(String videoPath) async {
+  void _playVideo(String videoPath) async {
   final videoController = VideoPlayerController.file(File(videoPath));
 
   try {
@@ -123,10 +130,9 @@ void _playVideo(String videoPath) async {
                               builder: (context, VideoPlayerValue value, child) {
                                 final duration = value.duration.inMilliseconds;
                                 final position = value.position.inMilliseconds;
-
                                 return SliderTheme(
                                   data: SliderTheme.of(context).copyWith(
-                                    trackHeight: 8,
+                                     trackHeight: 8,
                                     thumbColor: Color.fromARGB(255, 1, 24, 36),
                                     activeTrackColor: Color.fromARGB(255, 1, 24, 36),
                                     inactiveTrackColor: Colors.grey.shade700,
@@ -158,106 +164,108 @@ void _playVideo(String videoPath) async {
                                         builder: (context, orientation) {
                                           return Center(
                                             child: Stack(
-                                              alignment: Alignment.bottomCenter,
-                                              children: [
-                                                AspectRatio(
-                                                  aspectRatio: videoController.value.aspectRatio,
-                                                  child: VideoPlayer(videoController),
-                                                ),
-                                                Positioned(
-                                                  bottom: 16,
+                                                  children: [
+                                                    AspectRatio(
+                                                      aspectRatio: videoController.value.aspectRatio,
+                                                      child: VideoPlayer(videoController),
+                                                    ),
+                                                    Positioned(
+                                                  bottom: 0,
                                                   left: 0,
                                                   right: 0,
-                                                  child: Row(
-                                                    children: [
-                                                      IconButton(
-                                                        icon: Icon(
-                                                          videoController.value.isPlaying
-                                                              ? Icons.pause
-                                                              : Icons.play_arrow,
-                                                          color: Color.fromARGB(255, 1, 24, 36),
-                                                          size: 32,
-                                                        ),
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            if (videoController.value.isPlaying) {
-                                                              videoController.pause();
-                                                            } else {
-                                                              videoController.play();
-                                                            }
-                                                          });
-                                                        },
-                                                      ),
-                                                      Expanded(
-                                                        child: ValueListenableBuilder(
-                                                          valueListenable: videoController,
-                                                          builder: (context, VideoPlayerValue value, child) {
-                                                            final duration = value.duration.inMilliseconds;
-                                                            final position = value.position.inMilliseconds;
-
-                                                            return SliderTheme(
-                                                              data: SliderTheme.of(context).copyWith(
-                                                                trackHeight: 8,
-                                                                thumbColor: Color.fromARGB(255, 1, 24, 36),
-                                                                activeTrackColor: Color.fromARGB(255, 1, 24, 36),
-                                                                inactiveTrackColor: Colors.grey.shade700,
-                                                                overlayColor: Color.fromARGB(100, 1, 24, 36),
-                                                                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-                                                              ),
-                                                              child: Slider(
-                                                                value: position.clamp(0, duration).toDouble(),
-                                                                min: 0,
-                                                                max: duration.toDouble(),
-                                                                onChanged: (newValue) {
-                                                                  videoController.seekTo(Duration(milliseconds: newValue.toInt()));
-                                                                },
-                                                              ),
-                                                            );
+                                                  child: Container(
+                                                    height: 56,
+                                                    color: Colors.black87,
+                                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                    child: Row(
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: [
+                                                        IconButton(
+                                                          icon: Icon(
+                                                            videoController.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                                                            color: Colors.white,
+                                                            size: 28,
+                                                          ),
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              videoController.value.isPlaying
+                                                                  ? videoController.pause()
+                                                                  : videoController.play();
+                                                            });
                                                           },
                                                         ),
+                                                        Expanded(
+                                                          child: ValueListenableBuilder(
+                                                            valueListenable: videoController,
+                                                            builder: (context, VideoPlayerValue value, child) {
+                                                              final duration = value.duration.inMilliseconds;
+                                                              final position = value.position.inMilliseconds;
+
+                                                              return SliderTheme(
+                                                                data: SliderTheme.of(context).copyWith(
+                                                                   trackHeight: 8,
+                                                                    thumbColor: Color.fromARGB(255, 229, 230, 231),
+                                                                    activeTrackColor: Color.fromARGB(255, 248, 247, 247),
+                                                                    inactiveTrackColor: Colors.grey.shade700,
+                                                                    overlayColor: Color.fromARGB(99, 113, 113, 113),
+                                                                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                                                                  ),
+                                                                child: Slider(
+                                                                  value: position.clamp(0, duration).toDouble(),
+                                                                  min: 0,
+                                                                  max: duration.toDouble(),
+                                                                  onChanged: (newValue) {
+                                                                    videoController.seekTo(
+                                                                      Duration(milliseconds: newValue.toInt()),
+                                                                    );
+                                                                  },
+                                                                ),
+                                                              );
+                                                            },
+                                                          ),
+                                                          ),
+                                                          IconButton(
+                                                            icon: Icon(Icons.fullscreen_exit, color: Colors.white, size: 28),
+                                                            onPressed: () {
+                                                              Navigator.pop(context);
+                                                            },
+                                                          ),
+                                                        ],
                                                       ),
-                                                      IconButton(
-                                                        icon: Icon(Icons.fullscreen_exit, color: Color.fromARGB(255, 1, 24, 36), size: 32),
-                                                        onPressed: () {
-                                                          Navigator.pop(context);
-                                                        },
-                                                      ),
-                                                    ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
+                                                ],
+                                              )
+                                            );
+                                          },
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 12),
-                      TextButton(
-                        child: Text("Zavřít", style: TextStyle(color: Colors.white, fontSize: 20)),
-                        onPressed: () {
-                          videoController.dispose();
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12),
+                        TextButton(
+                          child: Text("Zavřít", style: TextStyle(color: Colors.white, fontSize: 20)),
+                          onPressed: () {
+                            videoController.dispose();
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
-        );
-      },
-    );
-  } catch (e) {
+                );
+              },
+            ),
+          );
+        },
+      );
+    } catch (e) {}
   }
-}
 
   Future<String> sendPromptToGemini(String prompt) async {
     final String url =
@@ -284,13 +292,12 @@ void _playVideo(String videoPath) async {
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
 
-        // Správné parsování textu podle skutečné odpovědi
         final candidates = responseBody['candidates'];
         if (candidates != null && candidates.isNotEmpty) {
           final parts = candidates[0]['content']['parts'];
           if (parts != null && parts.isNotEmpty) {
             final String text = parts[0]['text'];
-            return text.trim(); // odstraníme newline
+            return text.trim();
           } else {
             return 'Chyba: Prázdné parts pole.';
           }
@@ -305,8 +312,14 @@ void _playVideo(String videoPath) async {
     }
   }
 
-
-
+  void deleteZipFile() async {
+  try {
+    await zipFile.delete();
+    print('Soubor ${widget.fileName} byl smazán.');
+  } catch (e) {
+    print('Nepodařilo se smazat soubor: $e');
+  }
+}
   void xmlParser(String xmlContent) {
     final document = xml.XmlDocument.parse(xmlContent);
     final chapter = document.findElements('chapter').first;
@@ -440,20 +453,22 @@ void _playVideo(String videoPath) async {
   Future<void> downloadAndSaveZip(String url) async {
   try {
     final response = await http.get(Uri.parse(url));
-    
+
     if (response.statusCode != 200) {
       throw ('Kód: ${response.statusCode}');
     }
 
-    final file = File('${widget.localDir.path}/${widget.fileName}');
-    
-    if (await file.exists()) {
+    if (await zipFile.exists()) {
       throw ('${widget.fileName} již máte stáhlý.');
     }
 
-    await file.writeAsBytes(response.bodyBytes);
-    debugPrint('Soubor uložen: ${file.path}');
-    
+    await zipFile.writeAsBytes(response.bodyBytes);
+    debugPrint('Soubor uložen: ${zipFile.path}');
+
+    setState(() {
+      fileExists = true;
+    });
+
   } catch (e) { 
     if (e.toString().contains('SocketException')) {
       throw 'Nemáš připojení k internetu.';
@@ -470,43 +485,96 @@ void _playVideo(String videoPath) async {
 Widget build(BuildContext context) {
   final bool isResponseAvailable = aiResponse.isNotEmpty;
 
-  return Scaffold(
+    return Scaffold(
     backgroundColor: Color.fromARGB(255, 99, 184, 230),
-    appBar: AppBar(
-      backgroundColor: Color.fromARGB(255, 1, 24, 36),
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: Colors.white),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      title: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          title,
-          style: TextStyle(fontSize: 20, color: Colors.white),
-        ),
-      ),
-      actions: [
+   appBar: AppBar(
+    backgroundColor: Color.fromARGB(255, 1, 24, 36),
+    automaticallyImplyLeading: false,
+    title: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
         IconButton(
-          icon: Icon(Icons.download, color: Colors.white),
-          onPressed: () async {
-            final url = 'https://raw.githubusercontent.com/Hamzic12/${widget.selectedRepo}/main/${widget.fileName}';
-             try {
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+
+        Expanded(
+          child: Center(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                title,
+                style: TextStyle(fontSize: 20, color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.remove_circle,
+                color: fileExists ? Colors.red : Colors.grey,
+              ),
+              onPressed: fileExists
+                  ? () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: Color.fromARGB(255, 99, 184, 230),
+                            title: Text("Potrvzení smazání", style: TextStyle(color: Colors.white)),
+                            content: Text(
+                              "Jsi si jistý, že chceš smazat soubor ${widget.fileName}?",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text("Smazat", style: TextStyle(color: Colors.red)),
+                                onPressed: () async {
+                                  deleteZipFile();
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              TextButton(
+                                child: Text("Zrušit", style: TextStyle(color: Colors.white)),
+                                onPressed: () => Navigator.of(context).pop(),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  : null,
+            ),
+            IconButton(
+              icon: Icon(Icons.download, color: Colors.white),
+              onPressed: () async {
+                final url = 'https://raw.githubusercontent.com/Hamzic12/${widget.selectedRepo}/main/${widget.fileName}';
+                try {
                     await downloadAndSaveZip(url);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Soubor byl úspěšně stažen.')),
-                    );
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('$e ')),
-                    );
-                  }
+                      SnackBar(content: Text('Soubor byl úspěšně stažen.'),
+                      duration: Duration(milliseconds: 1000),
+                    ),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('$e'),
+                    duration: Duration(milliseconds: 1000),
+                    ),
+                  );
                 }
-        )
-      ]
+              },
+            ),
+          ],
+        ),
+      ],
     ),
-    body: Center(
+  ),
+   body: Center(
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -611,8 +679,8 @@ Widget build(BuildContext context) {
                                     fontSize: 15,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline,  // Podtržení
-                                    decorationColor: Colors.white,  // Bílé podtržení
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Colors.white,
                                     decorationThickness: 2
                                   ),
                                   ),
@@ -646,11 +714,11 @@ Widget build(BuildContext context) {
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 15,
-                                      color: Colors.white,  // Bílé písmo
+                                      color: Colors.white,
                                       fontWeight: FontWeight.bold,
-                                      decoration: TextDecoration.underline,  // Podtržení
-                                      decorationColor: Colors.white,  // Bílé podtržení
-                                      decorationThickness: 2,  // Tloušťka podtržení
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: Colors.white,
+                                      decorationThickness: 2,
                                     ),
                                   ),
                     ),

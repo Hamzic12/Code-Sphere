@@ -208,7 +208,7 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
       );
 
       final connectivity = await Connectivity().checkConnectivity();
-      if (connectivity != ConnectivityResult.none) {
+      if (connectivity != ConnectivityResult.none || repoName.isNotEmpty) {
         final response = await http.get(Uri.parse(githubURL));
 
         if (response.statusCode == 200) {
@@ -356,17 +356,17 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
             const SizedBox(width: 3),
            IconButton(
               icon: Icon(
-          Icons.remove_circle, color: repoList.isEmpty ? Colors.grey : Colors.redAccent),
+              Icons.remove_circle, color: repoList.isEmpty ? Colors.grey : Colors.redAccent),
               iconSize: 20,
               onPressed: repoList.isEmpty
-                  ? null // disables the button
+                  ? null
                   : () {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
                           backgroundColor: const Color.fromARGB(255, 99, 184, 230),
-                          title: const Text('Smazat kapitolu', style: TextStyle(color: Colors.white)),
-                          content: Text('Chcete smazat kapitolu $repoName?', style: const TextStyle(color: Colors.black)),
+                          title: const Text('Potrvzení smazání', style: TextStyle(color: Colors.white)),
+                          content: Text('Chcete smazat odkaz k repozitáři: $repoName?', style: const TextStyle(color: Colors.white)),
                           actions: [
                             TextButton(
                               onPressed: () {
