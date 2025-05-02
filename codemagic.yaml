@@ -1,26 +1,6 @@
 workflows:
   build-ios:
     name: Build iOS
-    environment:
-      flutter: "3.8.0-24.0.dev"
+    environment:    
       vars:
         API_KEY: $API_KEY
-    scripts:
-      - name: Install dependencies
-        script: |
-          cd code_sphere_app
-          flutter pub get
-
-      - name: Generate .env from API_KEY
-        script: |
-          cd code_sphere_app
-          echo "API_KEY=$API_KEY" > .env
-
-      - name: Build iOS (no code signing)
-        script: |
-          cd code_sphere_app
-          flutter build ios --release --no-codesign
-
-    artifacts:
-      - code_sphere_app/build/ios/iphoneos/Runner.app
-      - code_sphere_app/build/ios/iphoneos/*.dSYM
