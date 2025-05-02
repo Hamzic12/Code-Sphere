@@ -1,4 +1,9 @@
-scripts:
-  - name: Generování .env souboru
-    script: |
-      echo "API_KEY=$API_KEY" > .env
+workflows:
+  build-android:
+    name: Build Android APK
+    environment:
+      flutter: stable
+    scripts:
+      - name: Generování .env souboru
+        script: |
+          echo "API_KEY=$API_KEY" > .env
