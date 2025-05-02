@@ -2,4 +2,3 @@ scripts:
   - name: Generování .env souboru
     script: |
       echo "API_KEY=$API_KEY" > .env
-      echo "BASE_URL=$BASE_URL" >> .env  # Přidej další, pokud máš víc proměnných
