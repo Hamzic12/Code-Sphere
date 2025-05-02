@@ -7,7 +7,7 @@ workflows:
       groups:
         - api
     scripts:
-      - name: Vytvoř .env soubor
+      - name: Vytvoření .env souboru
         script: |
           echo "API_KEY=$API_KEY" > code_sphere_app/.env
       - name: Flutter Pub Get
@@ -16,6 +16,10 @@ workflows:
           flutter pub get
       - name: Flutter Build iOS
         script: |
-          cd code_sphere_app
-          flutter clean  # Tohle přidat může pomoct vyčistit cache
           flutter build ios --release --no-codesign
+      - name: Zabalit Runner.app do ZIP
+        script: |
+          zip -r build/ios/iphoneos/Runner.app.zip build/ios/iphoneos/Runner.app
+      - name: Uložení ZIP souboru
+        script: |
+          mv build/ios/iphoneos/Runner.app.zip $HOME/Runner.app.zip
