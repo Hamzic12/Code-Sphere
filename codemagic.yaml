@@ -4,7 +4,6 @@ workflows:
     environment:
       flutter: 3.32.0-0.3.pre
       xcode: latest
-      android: latest
       groups:
         - api
     scripts:
@@ -93,3 +92,8 @@ workflows:
       - $HOME/Runner.app.zip
       - code_sphere_app/build/app/outputs/flutter-apk/app-release.apk
       - code_sphere_app/build/app/outputs/bundle/release/app-release.aab
+
+    publishing:
+      email:
+        recipients:
+          - Hamzic21@email.cz
