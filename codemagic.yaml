@@ -79,7 +79,10 @@ workflows:
       - name: Test API klíče
         script: |
           echo "Testuji API klíč..."
-          response=$(curl -s -w "%{http_code}" -H "Authorization: Bearer $API_KEY" https://api.gemini.com/v1/some_endpoint)
+          response=$(curl -s -w "%{http_code}" -H "Authorization: Bearer $API_KEY" \
+            -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$API_KEY" \
+            -d '{"contents":[{"parts":[{"text":"Testovací prompt."}]}]}')
+          
           http_code=$(echo $response | tail -n1)
           if [ "$http_code" -eq 200 ]; then
             echo "API klíč je validní, odpověď je OK."
@@ -92,8 +95,3 @@ workflows:
       - $HOME/Runner.app.zip
       - code_sphere_app/build/app/outputs/flutter-apk/app-release.apk
       - code_sphere_app/build/app/outputs/bundle/release/app-release.aab
-
-    publishing:
-      email:
-        recipients:
-          - Hamzic21@email.cz
