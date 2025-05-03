@@ -1,9 +1,10 @@
 workflows:
-  ios-build:
-    name: iOS Build
+  ios-android-build:
+    name: iOS and Android Build
     environment:
       flutter: 3.32.0-0.3.pre
       xcode: latest
+      android: latest
       groups:
         - api
     scripts:
@@ -14,6 +15,8 @@ workflows:
         script: |
           cd code_sphere_app
           flutter pub get
+          
+      # iOS Build
       - name: Flutter Build iOS
         script: |
           cd code_sphere_app
@@ -27,10 +30,6 @@ workflows:
             echo "Soubor Runner.app neexistuje."
             exit 1
           fi
-      - name: Výpis aktuálního adresáře
-        script: |
-          echo "Aktuální adresář:"
-          pwd
       - name: Zabalit Runner.app do ZIP
         script: |
           echo "Zabaluji Runner.app do ZIP..."
@@ -48,9 +47,49 @@ workflows:
       - name: Uložení ZIP souboru
         script: |
           mv code_sphere_app/build/ios/iphoneos/Runner.app.zip $HOME/Runner.app.zip
+
+      # Android Build
+      - name: Flutter Build APK (release)
+        script: |
+          cd code_sphere_app
+          flutter build apk --release
+      - name: Flutter Build AAB (release)
+        script: |
+          cd code_sphere_app
+          flutter build appbundle --release
+      - name: Zkontrolovat přítomnost APK
+        script: |
+          cd code_sphere_app
+          if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
+            echo "APK soubor existuje."
+          else
+            echo "APK soubor neexistuje."
+            exit 1
+          fi
+      - name: Zkontrolovat přítomnost AAB
+        script: |
+          cd code_sphere_app
+          if [ -f "build/app/outputs/bundle/release/app-release.aab" ]; then
+            echo "AAB soubor existuje."
+          else
+            echo "AAB soubor neexistuje."
+            exit 1
+          fi
+
+      # Test API klíče
+      - name: Test API klíče
+        script: |
+          echo "Testuji API klíč..."
+          response=$(curl -s -w "%{http_code}" -H "Authorization: Bearer $API_KEY" https://api.gemini.com/v1/some_endpoint)
+          http_code=$(echo $response | tail -n1)
+          if [ "$http_code" -eq 200 ]; then
+            echo "API klíč je validní, odpověď je OK."
+          else
+            echo "Chyba API: Odpověď $http_code."
+            exit 1
+          fi
+
     artifacts:
       - $HOME/Runner.app.zip
-    publishing:
-      email:
-        recipients:
-          - Hamzic21@email.cz
+      - code_sphere_app/build/app/outputs/flutter-apk/app-release.apk
+      - code_sphere_app/build/app/outputs/bundle/release/app-release.aab
