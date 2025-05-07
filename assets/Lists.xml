@@ -1,7 +1,7 @@
 <chapter>
-	<title>Lists in Python</title>
+	<title>Seznamy v Pythonu</title>
 	<theory>
-        <text>Python <i>list</i> je datová struktura, která uchovává uspořádanou kolekci položek. Může obsahovat libovolný typ dat, například <b>čísla</b>, <b>řetězce</b>, nebo dokonce <i>jiné seznamy</i>. Seznamy jsou indexovány a <b>indexy začínají od 0</b>.</text>
+        <text>Python <i>seznam</i> je datová struktura, která uchovává uspořádanou kolekci položek. Může obsahovat libovolný typ dat, například <b>čísla</b>, <b>řetězce</b>, nebo dokonce <i>jiné seznamy</i>. Seznamy jsou indexovány a <b>indexy začínají od 0</b>.</text>
         <note>Seznamy se v Pythonu definují pomocí hranatých závorek []. Například: <pre>my_list = [1, 2, 3]</pre>.</note>
     </theory>
 	<warning>
@@ -9,11 +9,11 @@
         <note>Například: <pre>my_list[0] = 10</pre> změní první prvek seznamu na hodnotu 10.</note>
     </warning>
 	<code>
-        <text>my_list = [1, "hello", 3.14, True]</text>
+        <text>my_list = [1, "ahoj", 3.14, True]</text>
         <note><pre>Seznamy se používají pro ukládání více hodnot do jedné proměnné. Příklad kódu pro vytvoření seznamu:</pre></note>
     </code>
 	<ai_prompt>
-        <prompt>Explain how to use lists in Python</prompt>
+        <prompt>Vysvětli, jak používat seznamy v Pythonu</prompt>
         <note>Seznamy jsou skvělé pro práci s více datovými položkami najednou a mají mnoho užitečných metod jako <b>append()</b>, <b>remove()</b>, a <b>pop()</b>.</note>
     </ai_prompt>
 	<links>
@@ -21,29 +21,29 @@
         <note>Oficiální dokumentace o seznamu v Pythonu.</note>
     </links>
 	<video>
-        <file_name>videoplayback.mp4</file_name>
+        <file_name>lists.mp4</file_name>
         <note>Video o práci se seznamy v Pythonu.</note>
     </video>
 	<quiz>
 		<question>
-            <text>What is the index of the first element in a Python list?</text>
-            <note>Remember, lists are 0-indexed!</note>
+            <text>Jaký je index prvního prvku v seznamu Pythonu?</text>
+            <note>Pamatujte, seznamy mají indexování začínající od 0!</note>
             <answer correct=FALSE>1</answer>
             <answer correct=FALSE>2</answer>
             <answer correct=FALSE>-1</answer>
             <answer correct=TRUE>0</answer>
         </question>
 		<question>
-            <text>What will the following code output? <pre>my_list = [1, 2, 3]; print(my_list[1])</pre></text>
-            <note>Make sure you understand indexing in lists!</note>
+            <text>Co tento kód vypíše? <pre>my_list = [1, 2, 3]; print(my_list[1])</pre></text>
+            <note>Ujistěte se, že rozumíte indexování v seznamech!</note>
             <answer correct=TRUE>2</answer>
             <answer correct=FALSE>1</answer>
             <answer correct=FALSE>3</answer>
             <answer correct=FALSE>None</answer>
         </question>
         <question>
-            <text>Which of the following methods adds an item to the end of a list?</text>
-            <note>Methods like <b>append()</b> and <b>insert()</b> are used to modify lists.</note>
+            <text>Která z následujících metod přidá položku na konec seznamu?</text>
+            <note>Metody jako <b>append()</b> a <b>insert()</b> se používají pro modifikaci seznamů.</note>
             <answer correct=TRUE>append()</answer>
             <answer correct=FALSE>remove()</answer>
             <answer correct=FALSE>pop()</answer>

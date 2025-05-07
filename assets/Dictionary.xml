@@ -1,0 +1,53 @@
+<chapter>
+	<title>Slovníky v Pythonu</title>
+	<theory>
+        <text>Python <i>slovník</i> je datová struktura, která uchovává páry <b>klíč</b>-<b>hodnota</b>. Klíče musí být jedinečné a neměnné, zatímco hodnoty mohou být libovolného typu, včetně dalších slovníků nebo seznamů. Slovníky jsou neřazené, což znamená, že pořadí položek není zaručeno.</text>
+        <note>Slovníky v Pythonu se definují pomocí složených závorek <pre>my_dict = {"key1": "value1", "key2": "value2"}</pre>.</note>
+  </theory>
+	<warning>
+        <text>Pokud se pokusíte použít neměnný (immutable) objekt, jako například seznam, jako klíč ve slovníku, Python vyhodí chybu.</text>
+        <note>Například: <pre>my_dict = {[1, 2]: "value"}</pre> způsobí chybu, protože seznam není platný klíč.</note>
+  </warning>
+	<code>
+        <text><pre>my_dict = {"name": "Alice", "age": 25}</pre></text>
+        <note>Pro práci se slovníky můžete použít metody jako <b>get()</b>, <b>keys()</b>, a <b>values()</b>. Například:</note>
+    </code>
+	<ai_prompt>
+        <prompt>Vysvětli, jak fungují slovníky v Pythonu</prompt>
+        <note>Slovníky jsou užitečné pro uchovávání hodnot, které mají jedinečné klíče. Můžete je použít pro rychlé vyhledávání hodnot na základě klíče.</note>
+  </ai_prompt>
+	<links>
+        <link>https://docs.python.org/3/tutorial/datastructures.html#dictionaries</link>
+        <note>Oficiální dokumentace o slovnících v Pythonu.</note>
+  </links>
+	<video>
+        <file_name>Create a Dictionary Using Python.mp4</file_name>
+        <note>Video o práci se slovníky v Pythonu.</note>
+    </video>
+	<quiz>
+		<question>
+            <text>Co je to slovník v Pythonu?</text>
+            <note>Pamatujte, že slovník uchovává páry klíč-hodnota!</note>
+            <answer correct=TRUE>Soubor párů klíč-hodnota</answer>
+            <answer correct=FALSE>Seznam položek</answer>
+            <answer correct=FALSE>Seřazená kolekce</answer>
+            <answer correct=FALSE>Sada unikátních klíčů</answer>
+        </question>
+		<question>
+            <text>Co se stane, pokud se pokusíte použít mutable objekt jako klíč ve slovníku?</text>
+            <note>Mutable objekty, jako seznamy, nelze použít jako klíče ve slovníku v Pythonu.</note>
+            <answer correct=TRUE>Dojde k chybě</answer>
+            <answer correct=FALSE>Slovník to přijme</answer>
+            <answer correct=FALSE>Seznam bude převeden na n-tici</answer>
+            <answer correct=FALSE>Seznam bude ignorován</answer>
+        </question>
+        <question>
+            <text>Která metoda vrací všechny klíče ve slovníku Pythonu?</text>
+            <note>Metoda <b>keys()</b> je užitečná pro získání všech klíčů slovníku.</note>
+            <answer correct=TRUE>keys()</answer>
+            <answer correct=FALSE>values()</answer>
+            <answer correct=FALSE>items()</answer>
+            <answer correct=FALSE>get()</answer>
+        </question>
+	</quiz>
+</chapter>
