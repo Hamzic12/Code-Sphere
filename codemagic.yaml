@@ -1,6 +1,6 @@
 workflows:
-  ios-android-build:
-    name: iOS and Android Build
+  ios-build:
+    name: iOS Build
     environment:
       flutter: 3.32.0-0.3.pre
       xcode: latest
@@ -14,8 +14,7 @@ workflows:
         script: |
           cd code_sphere_app
           flutter pub get
-          
-      # iOS Build
+
       - name: Flutter Build iOS
         script: |
           cd code_sphere_app
@@ -47,34 +46,6 @@ workflows:
         script: |
           mv code_sphere_app/build/ios/iphoneos/Runner.app.zip $HOME/Runner.app.zip
 
-      # Android Build
-      - name: Flutter Build APK (release)
-        script: |
-          cd code_sphere_app
-          flutter build apk --release
-      - name: Flutter Build AAB (release)
-        script: |
-          cd code_sphere_app
-          flutter build appbundle --release
-      - name: Zkontrolovat přítomnost APK
-        script: |
-          cd code_sphere_app
-          if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
-            echo "APK soubor existuje."
-          else
-            echo "APK soubor neexistuje."
-            exit 1
-          fi
-      - name: Zkontrolovat přítomnost AAB
-        script: |
-          cd code_sphere_app
-          if [ -f "build/app/outputs/bundle/release/app-release.aab" ]; then
-            echo "AAB soubor existuje."
-          else
-            echo "AAB soubor neexistuje."
-            exit 1
-          fi
-
       # Test API klíče
       - name: Test API klíče
         script: |
@@ -93,5 +64,3 @@ workflows:
 
     artifacts:
       - $HOME/Runner.app.zip
-      - code_sphere_app/build/app/outputs/flutter-apk/app-release.apk
-      - code_sphere_app/build/app/outputs/bundle/release/app-release.aab
