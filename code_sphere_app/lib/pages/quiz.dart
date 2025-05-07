@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class QuizPage extends StatefulWidget {
+  final String title;
   final List<String> questions;
   final List<String> notes;
   final List<List<String>> answers;
@@ -8,6 +9,7 @@ class QuizPage extends StatefulWidget {
 
   const QuizPage({
     super.key,
+    required this.title,
     required this.questions,
     required this.notes,
     required this.answers,
@@ -31,8 +33,8 @@ Widget build(BuildContext context) {
     appBar: AppBar(
       backgroundColor: const Color.fromARGB(255, 1, 24, 36),
       centerTitle: true,
-      title: const Text('Kvíz'),
-      titleTextStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+      title: Text(widget.title),
+      titleTextStyle: const TextStyle(fontSize: 20, color: Colors.white),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () => Navigator.pop(context),
@@ -130,51 +132,54 @@ Widget build(BuildContext context) {
             physics: const NeverScrollableScrollPhysics(),
             childAspectRatio: 1.25,
             children: List.generate(4, (index) {
-              final isCorrect = widget.correctAnswers[currentIndex] == index;
-              final isSelected = selectedAnswer == index;
+            final isCorrect = widget.correctAnswers[currentIndex] == index;
+            final isSelected = selectedAnswer == index;
 
-              Color borderColor = Colors.white;
-              if (selectedAnswer != -1) {
-                if (isCorrect) {
-                  borderColor = Colors.green.shade800;
-                } else if (isSelected) {
-                  borderColor = Colors.red.shade800;
-                }
+            Color borderColor = Colors.white;
+            double borderThickness = 3.0;
+            if (selectedAnswer != -1) {
+              if (isCorrect) {
+                borderColor = const Color.fromARGB(255, 20, 243, 31);
+                borderThickness = 5.0;
+              } else if (isSelected) {
+                borderColor = Colors.red.shade800;
+                borderThickness = 5.0;
               }
+            }
 
-              return ElevatedButton(
-                onPressed: selectedAnswer == -1
-                    ? () {
-                        setState(() {
-                          selectedAnswer = index;
-                          if (widget.correctAnswers[currentIndex] == index) {
-                            correctCount++;
-                          }
-                        });
-                      }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: [
-                    const Color(0xFFE53935),
-                    const Color.fromARGB(255, 4, 103, 157),
-                    const Color(0xFF43A047),
-                    const Color.fromARGB(255, 191, 156, 2),
-                  ][index],
-                  side: BorderSide(color: borderColor, width: 3),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: const EdgeInsets.all(10),
+            return ElevatedButton(
+              onPressed: selectedAnswer == -1
+                  ? () {
+                      setState(() {
+                        selectedAnswer = index;
+                        if (widget.correctAnswers[currentIndex] == index) {
+                          correctCount++;
+                        }
+                      });
+                    }
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: [
+                  const Color(0xFFE53935),
+                  const Color.fromARGB(255, 4, 103, 157),
+                  const Color(0xFF43A047),
+                  const Color.fromARGB(255, 191, 156, 2),
+                ][index],
+                side: BorderSide(color: borderColor, width: borderThickness),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Center(
-                  child: Text(
-                    widget.answers[currentIndex][index],
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 17, color: Colors.white),
-                  ),
+                padding: const EdgeInsets.all(10),
+              ),
+              child: Center(
+                child: Text(
+                  widget.answers[currentIndex][index],
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 17, color: Colors.white),
                 ),
-              );
-            }),
+              ),
+            );
+          }),
           ),
         ),
       ],

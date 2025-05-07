@@ -10,6 +10,10 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<key>NSDocumentsFolderUsageDescription</key>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<string>Aplikace potřebuje přístup k dokumentům pro práci se soubory.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Code Sphere App</string>

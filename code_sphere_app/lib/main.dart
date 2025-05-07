@@ -13,6 +13,7 @@ class CodeSphere extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Color.fromARGB(255, 99, 184, 230),
         body: Center(

@@ -26,6 +26,7 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
   late Directory localDir;
   List<String> localZipFiles = [];
   List<String> repoList = [];
+  
   @override
   void initState() {
     super.initState();
@@ -283,27 +284,32 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
     final TextEditingController _repoController = TextEditingController();
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 99, 184, 230),
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 1, 24, 36),
-        foregroundColor: Colors.white,
-        centerTitle: true,
-        title: Row(
-          children: [
-            Container(
-              width: 170,
-              child: DropdownButtonHideUnderline(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 1, 24, 36),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: DropdownButton<String>(
+      backgroundColor: Color.fromARGB(255, 99, 184, 230),
+      appBar:AppBar(
+      backgroundColor: Color.fromARGB(255, 1, 24, 36),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      title: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 50.0),
+          child: GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: Color.fromARGB(255, 99, 184, 230),
+                  title: const Text('Vyberte repozitář', style: TextStyle(color: Colors.white)),
+                  content: DropdownButton<String>(
                     isExpanded: true,
-                    hint: const Text("        Kapitoly", style: TextStyle(color: Colors.white, fontSize: 20)),
+                    hint: const Text("Repozitáře", style: TextStyle(color: Colors.black)),
                     value: null,
-                    dropdownColor: const Color.fromARGB(255, 1, 24, 36),
+                    dropdownColor: Color.fromARGB(255, 1, 24, 36),
                     iconEnabledColor: Colors.white,
                     items: repoList.map((repo) {
                       return DropdownMenuItem<String>(
@@ -318,60 +324,69 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
                           loadRepoList();
                           fetchFileNames();
                         });
+                        Navigator.pop(context);
                       }
                     },
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 3),
-           IconButton(
-              icon: Icon(
-              Icons.remove_circle, color: repoList.isEmpty ? Colors.grey : Colors.redAccent),
-              iconSize: 20,
-              onPressed: repoList.isEmpty
-                  ? null
-                  : () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          backgroundColor: const Color.fromARGB(255, 99, 184, 230),
-                          title: const Text('Potrvzení smazání', style: TextStyle(color: Colors.white)),
-                          content: Text('Chcete smazat odkaz k repozitáři: $repoName?', style: const TextStyle(color: Colors.white)),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                deleteSelectedRepo();
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Smazat', style: TextStyle(color: Colors.red)),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Zavřít', style: TextStyle(color: Colors.black)),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: () async {
-              try {
-                await fetchFileNames();
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Chyba při aktualizaci souboru: $e')),
-                );
-              }
+              );
             },
-          )
-        ],
+            child: const Text(
+              "Kapitoly",
+              style: TextStyle(color: Colors.white, fontSize: 25, decoration: TextDecoration.underline,decorationColor: Colors.white, decorationThickness: 2.0),
+            ),
+          ),
+        ),
+      ],
+    ),
+  actions: [
+    IconButton(
+      icon: Icon(
+        Icons.delete,
+        color: repoList.isEmpty ? Color.fromARGB(255, 1, 24, 36) : Colors.redAccent,
       ),
+      iconSize: 25,
+      onPressed: repoList.isEmpty
+          ? null
+          : () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: Color.fromARGB(255, 99, 184, 230),
+                  title: const Text('Potvrzení smazání', style: TextStyle(color: Colors.white)),
+                  content: Text('Chcete smazat odkaz k repozitáři: $repoName?', style: const TextStyle(color: Colors.white)),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        deleteSelectedRepo();
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Smazat', style: TextStyle(color: Colors.red)),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Zavřít', style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+    const SizedBox(width: 10),
+    IconButton(
+      icon: const Icon(Icons.refresh, color: Colors.white),
+      onPressed: () async {
+        try {
+          await fetchFileNames();
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Chyba při aktualizaci souboru: $e')),
+          );
+        }
+      },
+    ),
+  ],
+),
       body: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         itemCount: zipFilesList.length,
@@ -381,7 +396,7 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 1, 24, 36),
+                backgroundColor: Color.fromARGB(255, 1, 24, 36),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -421,21 +436,35 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color.fromARGB(255, 1, 24, 36),
+        backgroundColor: Color.fromARGB(255, 1, 24, 36),
         child: const Icon(Icons.add, color: Colors.white),
         onPressed: () {
           showDialog(
             context: context,
             builder: (context) {
               return AlertDialog(
-                backgroundColor: const Color.fromARGB(255, 99, 184, 230),
-                title: const Text("Přidat repozitář", style: TextStyle(color: Colors.white)),
-                content: TextField(
-                  controller: _repoController,
-                  style: const TextStyle(color: Colors.black),
-                  decoration: const InputDecoration(
-                    hintText: 'Zadej název',
-                  ),
+                backgroundColor: Color.fromARGB(255, 99, 184, 230),
+                title: const Text(
+                  "Přidat repozitář",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Nápověda: github.com/Username/nazev-repozitráře",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: _repoController,
+                      style: const TextStyle(color: Colors.black),
+                      decoration: const InputDecoration(
+                        hintText: 'Zadejte nazev-repozitráře',
+                      ),
+                    ),
+                  ],
                 ),
                 actions: [
                   TextButton(
@@ -445,6 +474,8 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
                         try {
                           final file = File('${localDir.path}/repo.txt');
                           await file.writeAsString('$input\n', mode: FileMode.append);
+                          repoName = input;
+                          fetchFileNames();
 
                           setState(() {
                             repoList.add(input);
@@ -458,7 +489,7 @@ class _LoadingChaptersPage extends State<LoadingChaptersPage> {
                         }
                       }
                     },
-                    child: const Text("Přidat", style: TextStyle(color: Colors.white)),
+                    child: const Text("Přidat", style: TextStyle(fontSize: 16,color: Colors.white)),
                   )
                 ],
               );
